@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 学习风格测试 - 发现孩子的学习超能力</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4A90E2',
+                        image: '#3498db',    // 图像型 - 蓝色
+                        audio: '#2ecc71',    // 听讲型 - 绿色
+                        kinesthetic: '#e67e22', // 动手型 - 橙色
+                        logical: '#9b59b6',  // 逻辑型 - 紫色
+                        neutral: '#f9f7f1',  // 背景色 - 柔和米色
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.5s ease-in-out',
+                        'pulse-light': 'pulse 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-shadow {
+                box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            }
+            .btn-hover {
+                transition: all 0.3s ease;
+            }
+            .btn-hover:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .progress-bar {
+                transition: width 0.5s ease-in-out;
+            }
+        }
+    </style>
+</head>
+<body class="bg-neutral min-h-screen font-sans text-gray-800">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <!-- 页面容器 -->
+        <div id="app" class="bg-white rounded-2xl card-shadow overflow-hidden">
+            
+            <!-- 欢迎页面 -->
+            <div id="welcome-screen" class="p-8 md:p-12 text-center animate-fade-in">
+                <div class="mb-8">
+                    <div class="inline-block p-4 rounded-full bg-primary/10 text-primary mb-4">
+                        <i class="fa fa-lightbulb-o text-4xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-shadow">AI 学习风格测试</h1>
+                    <p class="text-lg text-gray-600 mb-6">发现孩子的学习超能力 ✨</p>
+                </div>
+                
+                <div class="space-y-4 text-left max-w-2xl mx-auto">
+                    <p class="text-gray-700">每个孩子的大脑，都有自己更舒服的学习方式。</p>
+                    <p class="text-gray-700">有的人看图就懂，有的人听别人讲更容易明白，有的人要动手试一试，还有的人喜欢先搞懂背后的规律。</p>
+                    
+                    <div class="mt-8 p-6 bg-blue-50 rounded-xl">
+                        <h3 class="font-bold text-blue-800 mb-3">测试说明：</h3>
+                        <ul class="space-y-2 text-blue-700">
+                            <li><i class="fa fa-check-circle mr-2"></i> 共 20 道轻松小问题</li>
+                            <li><i class="fa fa-check-circle mr-2"></i> 没有标准答案，也没有好坏对错</li>
+                            <li><i class="fa fa-check-circle mr-2"></i> 只需要选择最像你的那个选项：A、B、C 或 D</li>
+                            <li><i class="fa fa-check-circle mr-2"></i> 测试完成后，将获得专属学习风格报告</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button id="start-test" class="mt-10 px-8 py-4 bg-primary text-white rounded-full text-lg font-semibold btn-hover shadow-lg">
+                    开始测试 <i class="fa fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+            
+            <!-- 测试页面 -->
+            <div id="test-screen" class="hidden">
+                <!-- 进度条 -->
+                <div class="w-full bg-gray-200 h-2">
+                    <div id="progress-bar" class="bg-primary h-2 progress-bar" style="width: 5%"></div>
+                </div>
+                
+                <div class="p-8 md:p-12">
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="text-sm text-gray-500">
+                            问题 <span id="current-question">1</span>/20
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            <i class="fa fa-clock-o mr-1"></i> 
+                            <span id="timer">00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div id="question-container" class="mb-10 animate-slide-in">
+                        <h2 id="question-text" class="text-2xl font-bold mb-8 text-center">问题加载中...</h2>
+                        
+                        <div id="options-container" class="space-y-4">
+                            <!-- 选项将通过JS动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <div id="feedback-container" class="hidden mt-6 p-4 rounded-lg text-center animate-fade-in"></div>
+                </div>
+            </div>
+            
+            <!-- 结果页面 -->
+            <div id="result-screen" class="hidden p-8 md:p-12">
+                <div class="text-center mb-10">
+                    <div class="inline-block p-4 rounded-full bg-primary/10 text-primary mb-4">
+                        <i class="fa fa-trophy text-4xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-primary mb-2 text-shadow">测试完成！</h1>
+                    <p class="text-lg text-gray-600">发现了你的学习超能力 🎉</p>
+                </div>
+                
+                <div id="result-content" class="space-y-8 animate-fade-in">
+                    <!-- 结果内容将通过JS动态生成 -->
+                </div>
+                
+                <div class="mt-12 text-center">
+                    <button id="restart-test" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-full text-lg font-semibold btn-hover mr-4">
+                        <i class="fa fa-refresh mr-2"></i> 重新测试
+                    </button>
+                    <button id="share-result" class="px-6 py-3 bg-primary text-white rounded-full text-lg font-semibold btn-hover">
+                        <i class="fa fa-share-alt mr-2"></i> 分享结果
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>适合 8-15 岁孩子使用 | 本测试仅供参考，非专业诊断工具</p>
+            <p class="mt-2">© 2025 AI 学习风格测试助手</p>
+        </footer>
+    </div>
+    
+    <!-- 分享弹窗 -->
+    <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">分享测试结果</h3>
+                <button id="close-share" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="share-content" class="mb-6">
+                <!-- 分享内容将通过JS动态生成 -->
+            </div>
+            
+            <div class="space-y-3">
+                <button class="w-full py-3 bg-green-500 text-white rounded-lg font-semibold btn-hover">
+                    <i class="fa fa-wechat mr-2"></i> 分享到微信
+                </button>
+                <button class="w-full py-3 bg-blue-500 text-white rounded-lg font-semibold btn-hover">
+                    <i class="fa fa-qq mr-2"></i> 分享到QQ
+                </button>
+                <button id="copy-result" class="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold btn-hover">
+                    <i class="fa fa-copy mr-2"></i> 复制结果
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 测试题目数据
+        const questions = [
+            {
+                id: 1,
+                text: "学一个新知识时，你最喜欢：",
+                options: [
+                    { id: "A", text: "先看图、动画或视频" },
+                    { id: "B", text: "听别人讲一遍" },
+                    { id: "C", text: "直接动手试试看" },
+                    { id: "D", text: "先搞懂它的规则和原因" }
+                ]
+            },
+            {
+                id: 2,
+                text: "老师讲题时，你最容易被什么吸引？",
+                options: [
+                    { id: "A", text: "板书、图示、颜色标记" },
+                    { id: "B", text: "老师讲解的语气和故事" },
+                    { id: "C", text: "可以自己上手操作的部分" },
+                    { id: "D", text: "解题步骤背后的规律" }
+                ]
+            },
+            {
+                id: 3,
+                text: "记一个单词时，你更常用：",
+                options: [
+                    { id: "A", text: "想象画面或配图" },
+                    { id: "B", text: "大声读出来、多听几遍" },
+                    { id: "C", text: "写一写、做动作、用它造句" },
+                    { id: "D", text: "拆词根、找规律、分类记" }
+                ]
+            },
+            {
+                id: 4,
+                text: "遇到一道难题，你通常会：",
+                options: [
+                    { id: "A", text: "画图帮助自己理解" },
+                    { id: "B", text: "找人讲给我听，或一起讨论" },
+                    { id: "C", text: "先试几种方法" },
+                    { id: "D", text: "分析题目条件，找突破口" }
+                ]
+            },
+            {
+                id: 5,
+                text: "你更喜欢哪种作业？",
+                options: [
+                    { id: "A", text: "做思维导图、海报、图文笔记" },
+                    { id: "B", text: "讲给别人听、录音、讨论" },
+                    { id: "C", text: "做实验、做手工、完成任务" },
+                    { id: "D", text: "解谜题、推理题、找规律题" }
+                ]
+            },
+            {
+                id: 6,
+                text: "上课最让你开心的是：",
+                options: [
+                    { id: "A", text: "有很多图片、视频和颜色" },
+                    { id: "B", text: "老师讲得有趣，还能互动" },
+                    { id: "C", text: "可以动手参与，不只是听" },
+                    { id: "D", text: "知识很有逻辑，越想越有意思" }
+                ]
+            },
+            {
+                id: 7,
+                text: "如果要学习一个历史故事，你更想：",
+                options: [
+                    { id: "A", text: "看时间线、地图、漫画" },
+                    { id: "B", text: "听老师讲成故事" },
+                    { id: "C", text: "扮演角色或做小剧场" },
+                    { id: "D", text: "分析事件为什么会发生" }
+                ]
+            },
+            {
+                id: 8,
+                text: "如果要学习科学知识，你更想：",
+                options: [
+                    { id: "A", text: "看结构图和演示视频" },
+                    { id: "B", text: "听老师一步步解释" },
+                    { id: "C", text: "做实验验证一下" },
+                    { id: "D", text: "研究背后的原理" }
+                ]
+            },
+            {
+                id: 9,
+                text: "你复习时最喜欢：",
+                options: [
+                    { id: "A", text: "看自己整理的图表和重点颜色" },
+                    { id: "B", text: "读出来，或者让别人提问我" },
+                    { id: "C", text: "边写边练，做几道题找感觉" },
+                    { id: "D", text: "总结规律，整理成方法" }
+                ]
+            },
+            {
+                id: 10,
+                text: "当你学不会时，你最希望别人：",
+                options: [
+                    { id: "A", text: "画个图给我看" },
+                    { id: "B", text: "再讲一遍给我听" },
+                    { id: "C", text: "带我做一遍" },
+                    { id: "D", text: "告诉我为什么这样做" }
+                ]
+            },
+            {
+                id: 11,
+                text: "你更容易记住：",
+                options: [
+                    { id: "A", text: "看到过的画面" },
+                    { id: "B", text: "听过的话" },
+                    { id: "C", text: "自己做过的事" },
+                    { id: "D", text: "想明白的规律" }
+                ]
+            },
+            {
+                id: 12,
+                text: "如果有一个 AI 学习助手，你最希望它：",
+                options: [
+                    { id: "A", text: "帮我生成图片、图表、思维导图" },
+                    { id: "B", text: "像朋友/老师一样和我聊天讲解" },
+                    { id: "C", text: "带我闯关、做任务、一步步练习" },
+                    { id: "D", text: "帮我分析问题、总结方法和规律" }
+                ]
+            },
+            {
+                id: 13,
+                text: "做课堂笔记时，你更可能：",
+                options: [
+                    { id: "A", text: "用箭头、颜色、框框画重点" },
+                    { id: "B", text: "记老师说的关键词" },
+                    { id: "C", text: "边听边写例子或步骤" },
+                    { id: "D", text: "整理出公式、规则和逻辑" }
+                ]
+            },
+            {
+                id: 14,
+                text: "你觉得哪种学习最无聊？",
+                options: [
+                    { id: "A", text: "全是文字，没有图" },
+                    { id: "B", text: "一直安静看书，没人讲" },
+                    { id: "C", text: "一直坐着听，不能动手" },
+                    { id: "D", text: "只背答案，不讲为什么" }
+                ]
+            },
+            {
+                id: 15,
+                text: "如果参加一个学习挑战，你更想：",
+                options: [
+                    { id: "A", text: "设计一张漂亮的知识地图" },
+                    { id: "B", text: "和伙伴一起完成并分享" },
+                    { id: "C", text: "通过一关又一关的任务" },
+                    { id: "D", text: "破解一个复杂问题" }
+                ]
+            },
+            {
+                id: 16,
+                text: "你完成一个新任务前，通常会：",
+                options: [
+                    { id: "A", text: "先看看示例长什么样" },
+                    { id: "B", text: "先听别人怎么说" },
+                    { id: "C", text: "先开始做，边做边改" },
+                    { id: "D", text: "先想清楚步骤和规则" }
+                ]
+            },
+            {
+                id: 17,
+                text: "你更喜欢的课堂活动是：",
+                options: [
+                    { id: "A", text: "看图猜知识、做图卡" },
+                    { id: "B", text: "小组讨论、回答问题" },
+                    { id: "C", text: "动手制作、实验挑战" },
+                    { id: "D", text: "推理分析、寻找规律" }
+                ]
+            },
+            {
+                id: 18,
+                text: "当你需要背一段内容时，你会：",
+                options: [
+                    { id: "A", text: "把内容变成图像或关键词卡片" },
+                    { id: "B", text: "反复朗读，或者讲给别人听" },
+                    { id: "C", text: "写下来、演出来、用起来" },
+                    { id: "D", text: "拆成结构，理解后再记" }
+                ]
+            },
+            {
+                id: 19,
+                text: "你最有成就感的时刻是：",
+                options: [
+                    { id: "A", text: "我把复杂内容画清楚了" },
+                    { id: "B", text: "我把别人讲懂了，或被鼓励了" },
+                    { id: "C", text: "我亲手完成了一个作品/任务" },
+                    { id: "D", text: "我终于想明白一个难问题" }
+                ]
+            },
+            {
+                id: 20,
+                text: "如果让你自由学习一天，你会：",
+                options: [
+                    { id: "A", text: "看视频、画笔记、做知识海报" },
+                    { id: "B", text: "听故事课、和别人讨论" },
+                    { id: "C", text: "做项目、玩中学、完成挑战" },
+                    { id: "D", text: "自己研究一个感兴趣的问题" }
+                ]
+            }
+        ];
+
+        // 学习风格数据
+        const learningStyles = {
+            A: {
+                name: "图像魔法师",
+                professionalName: "图像理解型学习者",
+                color: "#3498db", // 蓝色
+                icon: "fa-picture-o",
+                summary: "你更适合通过画面、颜色、结构和图像来理解知识。很多内容只要「看见」，你就更容易懂。",
+                superpower: "你特别擅长通过图片理解知识，用画面记住内容，快速抓住重点结构。别人看一大段文字会头疼，但你看到图表、动画、思维导图、视频演示时，可能会突然明白。你的大脑像一台「画面型学习引擎」。",
+                challenges: "如果一直抄写、死记、看密密麻麻的纯文字，你可能会越来越走神，记不住重点。不是你不聪明，而是你的大脑更需要「看见」。",
+                methods: [
+                    "用思维导图整理知识",
+                    "看动画、图解、视频",
+                    "用颜色区分重点",
+                    "把知识变成图像记忆",
+                    "自己画知识结构图"
+                ],
+                notGoodAt: [
+                    "长时间纯文字学习",
+                    "一直抄写和背诵",
+                    "没有图示的讲解",
+                    "密密麻麻、没有重点的笔记"
+                ],
+                aiHelp: [
+                    "让 AI 帮你生成思维导图",
+                    "让 AI 把复杂知识变成图解",
+                    "让 AI 做图像记忆卡片",
+                    "让 AI 生成学习海报",
+                    "让 AI 用步骤图解释难题"
+                ],
+                closingWords: "你不是学不会，你只是更适合通过画面理解世界。很多设计师、导演、科学家，小时候都很擅长用画面思考。找到适合自己的学习方式，比盲目努力更重要。"
+            },
+            B: {
+                name: "声音探险家",
+                professionalName: "听讲互动型学习者",
+                color: "#2ecc71", // 绿色
+                icon: "fa-volume-up",
+                summary: "你更适合通过听讲、交流、讨论和表达来学习。有人讲清楚、有人互动时，你会学得更快。",
+                superpower: "你特别擅长通过听讲理解知识，在交流中学习，边说边记忆。很多时候，只要有人讲清楚，你就能很快听懂。你的大脑像一个「声音和互动接收器」。",
+                challenges: "如果一直安静刷题、一个人闷头学习、只看书不交流，你可能容易分心、发呆、觉得无聊。不是你不认真，而是你的大脑需要互动。",
+                methods: [
+                    "听老师讲故事式讲解",
+                    "和别人讨论知识",
+                    "把知识讲给别人听",
+                    "用问答方式学习",
+                    "边读边说出来"
+                ],
+                notGoodAt: [
+                    "长时间安静死读",
+                    "完全没有互动的课堂",
+                    "一直默写背诵",
+                    "太孤独的学习环境"
+                ],
+                aiHelp: [
+                    "用 AI 语音讲题",
+                    "和 AI 聊天式学习",
+                    "用 AI 做英语口语陪练",
+                    "让 AI 不断提问你",
+                    "让 AI 像学习伙伴一样陪你复习"
+                ],
+                closingWords: "你不是不专心，你只是更适合通过交流学习。会表达、会提问、会把别人讲懂，本身就是很厉害的能力。"
+            },
+            C: {
+                name: "能量实验家",
+                professionalName: "动手实践型学习者",
+                color: "#e67e22", // 橙色
+                icon: "fa-flask",
+                summary: "你更适合在行动中学习。对你来说，光听不够，真正开始做以后，知识才会变清楚。",
+                superpower: "你特别擅长做中学、动手理解知识、在尝试中成长。你不是不想学，而是光听不做时，大脑容易「关机」。你的大脑像一台「行动型学习引擎」。",
+                challenges: "如果长期一直坐着听课、只靠刷题、不能实践，你可能会坐不住、注意力下降、越学越烦躁。这并不是懒，而是你的大脑需要参与感。",
+                methods: [
+                    "边做边学",
+                    "项目式学习",
+                    "游戏化挑战",
+                    "实验、制作、实践",
+                    "用任务推动学习"
+                ],
+                notGoodAt: [
+                    "长时间只听不做",
+                    "机械重复刷题",
+                    "没有挑战感的学习",
+                    "一直坐着不动的学习方式"
+                ],
+                aiHelp: [
+                    "让 AI 带你闯关学习",
+                    "让 AI 给你设计项目挑战",
+                    "用 AI 做编程练习",
+                    "让 AI 给你布置互动任务",
+                    "用 AI 把知识变成游戏化任务"
+                ],
+                closingWords: "你不是不自律，你只是更适合通过行动学习。很多发明家、工程师、创业者，小时候都喜欢拆东西、动手做、边试边学。实践力本身就是一种天赋。"
+            },
+            D: {
+                name: "逻辑破译者",
+                professionalName: "逻辑探索型学习者",
+                color: "#9b59b6", // 紫色
+                icon: "fa-puzzle-piece",
+                summary: "你更适合先理解原因、规律和方法。只要真正想明白，你就会学得很扎实。",
+                superpower: "你特别擅长发现规律、分析问题、独立思考。你经常会问「为什么」，想知道原理，也喜欢研究复杂问题。你的大脑像一台「规律发现机器」。",
+                challenges: "如果学习总是只背答案、不讲原因、机械重复，你可能会越来越抗拒，甚至觉得「学这个有什么意义」。不是你叛逆，而是你的大脑更需要理解。",
+                methods: [
+                    "先理解原理",
+                    "自己研究问题",
+                    "找规律和方法",
+                    "拆解复杂知识",
+                    "深度思考后再记忆"
+                ],
+                notGoodAt: [
+                    "死记硬背",
+                    "不解释原因的学习",
+                    "重复机械练习",
+                    "没有思考空间的学习"
+                ],
+                aiHelp: [
+                    "和 AI 深度问答",
+                    "让 AI 帮你做逻辑分析",
+                    "用 AI 学编程和 Prompt",
+                    "让 AI 拆解复杂问题",
+                    "让 AI 帮你总结方法和规律"
+                ],
+                closingWords: "你不是想太多，你只是更喜欢真正理解世界。很多科学家、程序员、研究者，小时候都特别爱问「为什么」。会思考，是一种非常珍贵的能力。"
+            }
+        };
+
+        // 应用状态
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let startTime = null;
+        let timerInterval = null;
+
+        // DOM 元素
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const testScreen = document.getElementById('test-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const startTestBtn = document.getElementById('start-test');
+        const restartTestBtn = document.getElementById('restart-test');
+        const shareResultBtn = document.getElementById('share-result');
+        const closeShareBtn = document.getElementById('close-share');
+        const copyResultBtn = document.getElementById('copy-result');
+        const shareModal = document.getElementById('share-modal');
+        const progressBar = document.getElementById('progress-bar');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const timerSpan = document.getElementById('timer');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const resultContent = document.getElementById('result-content');
+        const shareContent = document.getElementById('share-content');
+
+        // 开始测试
+        startTestBtn.addEventListener('click', () => {
+            welcomeScreen.classList.add('hidden');
+            testScreen.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            startTime = new Date();
+            
+            // 开始计时器
+            startTimer();
+            
+            // 显示第一题
+            showQuestion(currentQuestionIndex);
+        });
+
+        // 重新测试
+        restartTestBtn.addEventListener('click', () => {
+            resultScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+            clearInterval(timerInterval);
+        });
+
+        // 分享结果
+        shareResultBtn.addEventListener('click', () => {
+            shareModal.classList.remove('hidden');
+            generateShareContent();
+        });
+
+        // 关闭分享弹窗
+        closeShareBtn.addEventListener('click', () => {
+            shareModal.classList.add('hidden');
+        });
+
+        // 复制结果
+        copyResultBtn.addEventListener('click', () => {
+            const textToCopy = shareContent.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('结果已复制到剪贴板！');
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        });
+
+        // 开始计时器
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const elapsedTime = Math.floor((new Date() - startTime) / 1000);
+                const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+                const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+                timerSpan.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        // 显示问题
+        function showQuestion(index) {
+            const question = questions[index];
+            currentQuestionSpan.textContent = question.id;
+            questionText.textContent = question.text;
+            
+            // 更新进度条
+            const progress = ((index + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // 清空选项容器
+            optionsContainer.innerHTML = '';
+            
+            // 添加选项
+            question.options.forEach(option => {
+                const optionButton = document.createElement('button');
+                optionButton.className = `w-full text-left p-4 border-2 rounded-xl mb-3 btn-hover transition-all ${userAnswers[question.id] === option.id ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 hover:border-primary hover:bg-primary/5'}`;
+                optionButton.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center mr-3 ${userAnswers[question.id] === option.id ? 'border-primary bg-primary text-white' : 'border-gray-300'}">
+                            ${option.id}
+                        </div>
+                        <span class="text-lg">${option.text}</span>
+                    </div>
+                `;
+                
+                optionButton.addEventListener('click', () => {
+                    selectOption(question.id, option.id);
+                });
+                
+                optionsContainer.appendChild(optionButton);
+            });
+            
+            // 隐藏反馈
+            feedbackContainer.classList.add('hidden');
+        }
+
+        // 选择选项
+        function selectOption(questionId, optionId) {
+            userAnswers[questionId] = optionId;
+            
+            // 显示反馈
+            showFeedback(optionId);
+            
+            // 延迟后进入下一题
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion(currentQuestionIndex);
+                } else {
+                    // 测试完成
+                    finishTest();
+                }
+            }, 1000);
+        }
+
+        // 显示反馈
+        function showFeedback(optionId) {
+            feedbackContainer.innerHTML = `
+                <div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fa fa-check-circle text-green-500 text-xl mr-2"></i>
+                        <span>已选择 ${optionId}，继续下一题...</span>
+                    </div>
+                </div>
+            `;
+            feedbackContainer.classList.remove('hidden');
+        }
+
+        // 完成测试
+        function finishTest() {
+            clearInterval(timerInterval);
+            testScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            
+            // 生成结果
+            generateResult();
+        }
+
+        // 生成结果
+        function generateResult() {
+            // 统计分数
+            const scores = { A: 0, B: 0, C: 0, D: 0 };
+            for (const answer of Object.values(userAnswers)) {
+                scores[answer]++;
+            }
+            
+            // 找出最高分
+            let maxScore = Math.max(...Object.values(scores));
+            let topStyles = Object.keys(scores).filter(style => scores[style] === maxScore);
+            
+            // 生成结果内容
+            resultContent.innerHTML = '';
+            
+            // 标题部分
+            const titleSection = document.createElement('div');
+            titleSection.className = 'text-center mb-8';
+            
+            let mainStyle, secondaryStyle;
+            let resultTitle, resultSubtitle, resultColor, resultIcon;
+            
+            if (topStyles.length === 1) {
+                // 单一学习风格
+                mainStyle = topStyles[0];
+                const style = learningStyles[mainStyle];
+                resultTitle = style.name;
+                resultSubtitle = style.professionalName;
+                resultColor = style.color;
+                resultIcon = style.icon;
+                
+                titleSection.innerHTML = `
+                    <div class="inline-block p-4 rounded-full" style="background-color: ${resultColor}20; color: ${resultColor}">
+                        <i class="fa ${resultIcon} text-4xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold mt-4" style="color: ${resultColor}">${resultTitle}</h2>
+                    <p class="text-lg text-gray-600 mt-2">${resultSubtitle}</p>
+                `;
+            } else {
+                // 混合学习风格
+                mainStyle = topStyles[0];
+                secondaryStyle = topStyles[1];
+                const style1 = learningStyles[mainStyle];
+                const style2 = learningStyles[secondaryStyle];
+                
+                titleSection.innerHTML = `
+                    <div class="inline-block p-4 rounded-full bg-gradient-to-r ${style1.color}20 ${style2.color}20 text-primary">
+                        <i class="fa fa-random text-4xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold mt-4 text-primary">多元学习风格</h2>
+                    <p class="text-lg text-gray-600 mt-2">${style1.name} + ${style2.name}</p>
+                `;
+            }
+            
+            resultContent.appendChild(titleSection);
+            
+            // 分数统计
+            const scoreSection = document.createElement('div');
+            scoreSection.className = 'mb-8';
+            scoreSection.innerHTML = `
+                <h3 class="text-xl font-bold mb-4 text-center">你的学习风格分布</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center p-4 rounded-xl" style="background-color: ${learningStyles.A.color}20; border: 2px solid ${learningStyles.A.color}30">
+                        <div class="font-bold text-lg mb-2" style="color: ${learningStyles.A.color}">图像魔法师</div>
+                        <div class="text-2xl font-bold" style="color: ${learningStyles.A.color}">${scores.A}</div>
+                    </div>
+                    <div class="text-center p-4 rounded-xl" style="background-color: ${learningStyles.B.color}20; border: 2px solid ${learningStyles.B.color}30">
+                        <div class="font-bold text-lg mb-2" style="color: ${learningStyles.B.color}">声音探险家</div>
+                        <div class="text-2xl font-bold" style="color: ${learningStyles.B.color}">${scores.B}</div>
+                    </div>
+                    <div class="text-center p-4 rounded-xl" style="background-color: ${learningStyles.C.color}20; border: 2px solid ${learningStyles.C.color}30">
+                        <div class="font-bold text-lg mb-2" style="color: ${learningStyles.C.color}">能量实验家</div>
+                        <div class="text-2xl font-bold" style="color: ${learningStyles.C.color}">${scores.C}</div>
+                    </div>
+                    <div class="text-center p-4 rounded-xl" style="background-color: ${learningStyles.D.color}20; border: 2px solid ${learningStyles.D.color}30">
+                        <div class="font-bold text-lg mb-2" style="color: ${learningStyles.D.color}">逻辑破译者</div>
+                        <div class="text-2xl font-bold" style="color: ${learningStyles.D.color}">${scores.D}</div>
+                    </div>
+                </div>
+            `;
+            resultContent.appendChild(scoreSection);
+            
+            // 总结部分
+            const summarySection = document.createElement('div');
+            summarySection.className = 'mb-8';
+            
+            if (topStyles.length === 1) {
+                const style = learningStyles[mainStyle];
+                summarySection.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border-2" style="border-color: ${style.color}30">
+                        <h3 class="text-xl font-bold mb-4" style="color: ${style.color}">一句话总结</h3>
+                        <p class="text-lg text-gray-700">${style.summary}</p>
+                    </div>
+                `;
+            } else {
+                const style1 = learningStyles[mainStyle];
+                const style2 = learningStyles[secondaryStyle];
+                summarySection.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border-2 border-primary/30">
+                        <h3 class="text-xl font-bold mb-4 text-primary">一句话总结</h3>
+                        <p class="text-lg text-gray-700">你同时拥有 ${style1.name} 和 ${style2.name} 的学习优势，可以灵活运用两种学习方式。</p>
+                    </div>
+                `;
+            }
+            
+            resultContent.appendChild(summarySection);
+            
+            // 详细内容部分
+            if (topStyles.length === 1) {
+                const style = learningStyles[mainStyle];
+                
+                // 学习超能力
+                const superpowerSection = document.createElement('div');
+                superpowerSection.className = 'mb-8';
+                superpowerSection.innerHTML = `
+                    <div class="bg-gradient-to-r ${style.color}10 ${style.color}5 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: ${style.color}">
+                            <i class="fa fa-bolt mr-2"></i> 你的学习超能力
+                        </h3>
+                        <p class="text-gray-700">${style.superpower}</p>
+                    </div>
+                `;
+                resultContent.appendChild(superpowerSection);
+                
+                // 为什么有些学习方式会让你累
+                const challengesSection = document.createElement('div');
+                challengesSection.className = 'mb-8';
+                challengesSection.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold mb-4 text-gray-700">为什么有些学习方式会让你累</h3>
+                        <p class="text-gray-600">${style.challenges}</p>
+                    </div>
+                `;
+                resultContent.appendChild(challengesSection);
+                
+                // 你更适合这样学习
+                const methodsSection = document.createElement('div');
+                methodsSection.className = 'mb-8';
+                methodsSection.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold mb-4 text-gray-700">你更适合这样学习</h3>
+                        <ul class="space-y-2">
+                            ${style.methods.map(method => `
+                                <li class="flex items-center text-gray-600">
+                                    <i class="fa fa-check text-green-500 mr-2"></i> ${method}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                resultContent.appendChild(methodsSection);
+                
+                // 你可能不太适合
+                const notGoodAtSection = document.createElement('div');
+                notGoodAtSection.className = 'mb-8';
+                notGoodAtSection.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold mb-4 text-gray-700">你可能不太适合</h3>
+                        <ul class="space-y-2">
+                            ${style.notGoodAt.map(item => `
+                                <li class="flex items-center text-gray-600">
+                                    <i class="fa fa-times text-red-400 mr-2"></i> ${item}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                resultContent.appendChild(notGoodAtSection);
+                
+                // AI 可以怎么帮助你学习
+                const aiHelpSection = document.createElement('div');
+                aiHelpSection.className = 'mb-8';
+                aiHelpSection.innerHTML = `
+                    <div class="bg-gradient-to-r ${style.color}10 ${style.color}5 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: ${style.color}">
+                            <i class="fa fa-robot mr-2"></i> AI 可以怎么帮助你学习
+                        </h3>
+                        <ul class="space-y-2">
+                            ${style.aiHelp.map(help => `
+                                <li class="flex items-center text-gray-600">
+                                    <i class="fa fa-magic text-purple-500 mr-2"></i> ${help}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                resultContent.appendChild(aiHelpSection);
+                
+                // 你是独特的小孩
+                const closingSection = document.createElement('div');
+                closingSection.className = 'mb-8';
+                closingSection.innerHTML = `
+                    <div class="bg-primary/10 p-6 rounded-xl text-center">
+                        <h3 class="text-xl font-bold mb-4 text-primary">你是独特的小孩</h3>
+                        <p class="text-gray-700 italic">${style.closingWords}</p>
+                    </div>
+                `;
+                resultContent.appendChild(closingSection);
+            } else {
+                // 混合学习风格的详细内容
+                const style1 = learningStyles[mainStyle];
+                const style2 = learningStyles[secondaryStyle];
+                
+                // 学习超能力
+                const superpowerSection = document.createElement('div');
+                superpowerSection.className = 'mb-8';
+                superpowerSection.innerHTML = `
+                    <div class="bg-gradient-to-r from-primary/10 to-purple-100 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 flex items-center text-primary">
+                            <i class="fa fa-bolt mr-2"></i> 你的学习超能力
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-bold mb-2" style="color: ${style1.color}">${style1.name} 的优势</h4>
+                                <p class="text-gray-600 text-sm">${style1.superpower.substring(0, 100)}...</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-bold mb-2" style="color: ${style2.color}">${style2.name} 的优势</h4>
+                                <p class="text-gray-600 text-sm">${style2.superpower.substring(0, 100)}...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultContent.appendChild(superpowerSection);
+                
+                // 混合学习建议
+                const mixedMethodsSection = document.createElement('div');
+                mixedMethodsSection.className = 'mb-8';
+                mixedMethodsSection.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold mb-4 text-gray-700">混合学习建议</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold mb-3" style="color: ${style1.color}">${style1.name} 学习法</h4>
+                                <ul class="space-y-2">
+                                    ${style1.methods.slice(0, 3).map(method => `
+                                        <li class="flex items-center text-gray-600">
+                                            <i class="fa fa-check text-green-500 mr-2"></i> ${method}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold mb-3" style="color: ${style2.color}">${style2.name} 学习法</h4>
+                                <ul class="space-y-2">
+                                    ${style2.methods.slice(0, 3).map(method => `
+                                        <li class="flex items-center text-gray-600">
+                                            <i class="fa fa-check text-green-500 mr-2"></i> ${method}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                            <p class="text-blue-700"><i class="fa fa-lightbulb-o mr-2"></i> 建议：根据不同学科和内容，灵活切换两种学习方式，或者将它们结合起来使用。</p>
+                        </div>
+                    </div>
+                `;
+                resultContent.appendChild(mixedMethodsSection);
+                
+                // AI 可以怎么帮助你学习
+                const aiHelpSection = document.createElement('div');
+                aiHelpSection.className = 'mb-8';
+                aiHelpSection.innerHTML = `
+                    <div class="bg-gradient-to-r from-primary/10 to-purple-100 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 flex items-center text-primary">
+                            <i class="fa fa-robot mr-2"></i> AI 可以怎么帮助你学习
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-bold mb-2" style="color: ${style1.color}">${style1.name} 专属 AI 助手</h4>
+                                <ul class="space-y-1">
+                                    ${style1.aiHelp.slice(0, 3).map(help => `
+                                        <li class="flex items-center text-gray-600 text-sm">
+                                            <i class="fa fa-magic text-purple-500 mr-1"></i> ${help}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-bold mb-2" style="color: ${style2.color}">${style2.name} 专属 AI 助手</h4>
+                                <ul class="space-y-1">
+                                    ${style2.aiHelp.slice(0, 3).map(help => `
+                                        <li class="flex items-center text-gray-600 text-sm">
+                                            <i class="fa fa-magic text-purple-500 mr-1"></i> ${help}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultContent.appendChild(aiHelpSection);
+                
+                // 你是独特的小孩
+                const closingSection = document.createElement('div');
+                closingSection.className = 'mb-8';
+                closingSection.innerHTML = `
+                    <div class="bg-primary/10 p-6 rounded-xl text-center">
+                        <h3 class="text-xl font-bold mb-4 text-primary">你是独特的小孩</h3>
+                        <p class="text-gray-700 italic">拥有多种学习风格是一种优势！你可以根据不同的学习内容和场景，灵活选择最适合的学习方式。这种灵活性将帮助你在各种学习环境中都能取得好成绩。</p>
+                    </div>
+                `;
+                resultContent.appendChild(closingSection);
+            }
+        }
+
+        // 生成分享内容
+        function generateShareContent() {
+            // 统计分数
+            const scores = { A: 0, B: 0, C: 0, D: 0 };
+            for (const answer of Object.values(userAnswers)) {
+                scores[answer]++;
+            }
+            
+            // 找出最高分
+            let maxScore = Math.max(...Object.values(scores));
+            let topStyles = Object.keys(scores).filter(style => scores[style] === maxScore);
+            
+            let shareText = "【AI 学习风格测试结果】\n\n";
+            
+            if (topStyles.length === 1) {
+                const style = learningStyles[topStyles[0]];
+                shareText += `我的学习风格是：${style.name}（${style.professionalName}）\n\n`;
+                shareText += `一句话总结：${style.summary}\n\n`;
+                shareText += `我的学习超能力：${style.superpower.substring(0, 100)}...\n\n`;
+                shareText += `我更适合这样学习：\n`;
+                style.methods.slice(0, 3).forEach(method => {
+                    shareText += `- ${method}\n`;
+                });
+            } else {
+                const style1 = learningStyles[topStyles[0]];
+                const style2 = learningStyles[topStyles[1]];
+                shareText += `我的学习风格是：多元学习型（${style1.name} + ${style2.name}）\n\n`;
+                shareText += `我同时拥有两种学习优势，可以灵活运用不同的学习方式。\n\n`;
+                shareText += `适合我的学习方法：\n`;
+                shareText += `- ${style1.methods[0]}\n`;
+                shareText += `- ${style1.methods[1]}\n`;
+                shareText += `- ${style2.methods[0]}\n`;
+                shareText += `- ${style2.methods[1]}\n`;
+            }
+            
+            shareText += `\n测试链接：https://ai-learning-style-test.example.com`;
+            
+            shareContent.innerHTML = `<pre class="text-left whitespace-pre-wrap">${shareText}</pre>`;
+        }
+    </script>
+</body>
+</html>
